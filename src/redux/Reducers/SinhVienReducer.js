@@ -16,7 +16,7 @@ export const SinhVienReducer = (state = stateDefault, action) => {
             // console.log("sinh vien New", sinhVienNew);
 
             if (sinhVienNew) {
-                alert("Mã Sinh Viên đã tồn tại!")
+                alert("Mã Sinh Viên đã tồn tại!");
             } else {
                 dsSinhVien.push(payload.sinhVien);
             }
@@ -39,8 +39,19 @@ export const SinhVienReducer = (state = stateDefault, action) => {
         }
         case "CAP_NHAT_SINH_VIEN": {
             let dsSinhVien = [...state.dsSinhVien];
-            let sinhVienTam = dsSinhVien.find(sinhVien => sinhVien === payload);
-            return { ...state, sinhVienUpdate: sinhVienTam, isSignUp: false };
+
+            let idx = dsSinhVien.findIndex(sinhVien =>
+                sinhVien.maSV === payload.maSV
+            );
+
+            if (idx !== -1) {
+                dsSinhVien[idx] = payload;
+                alert("Cập nhật thành công");
+
+            }
+            state.dsSinhVien = dsSinhVien;
+            // return { ...state, sinhVienUpdate: null, isSignUp: true };
+            return { ...state, sinhVienUpdate: idx, isSignUp: false }
 
         }
         default:

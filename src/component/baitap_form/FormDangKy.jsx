@@ -6,15 +6,12 @@ class FormDangKy extends Component {
         sinhVien: {
             maSV: "",
             hoTen: "",
-            matKhau: "",
             soDienThoai: "",
             email: "",
-            loaiNguoiDung: "0"
         },
         error: {
             maSV: "",
             hoTen: "",
-            matKhau: "",
             soDienThoai: "",
             email: "",
         }
@@ -46,7 +43,7 @@ class FormDangKy extends Component {
         // xử lý validation theo trường hợp đặc biệt
         if (dataType === "email") {
             let regexEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-            if (regexEmail.test(value) == false) {
+            if (regexEmail.test(value) === false) {
                 error[name] = `${title} không đúng định dạng !`;
             } else {
                 error[name] = "";
@@ -88,6 +85,12 @@ class FormDangKy extends Component {
                     }
                 })
             } else {
+                this.props.dispatch({
+                    type: "CAP_NHAT_SINH_VIEN",
+                    payload: {
+                        sinhVien: this.state.sinhVien,
+                    }
+                })
             }
 
             this.setState({
@@ -167,8 +170,6 @@ class FormDangKy extends Component {
                                 })}
                         >Cập nhật</button>
                     </div>
-
-
                 </form>
 
             </div>
