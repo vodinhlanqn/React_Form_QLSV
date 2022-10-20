@@ -5,21 +5,26 @@ class TableDanhSachSinhVien extends Component {
 
     renderSinhVien = () => {
         const { dsSinhVien } = this.props;
-        return dsSinhVien.map((nhanVien, index) => {
+        return dsSinhVien.map((sinhVien, index) => {
             return (
                 <tr key={index} >
                     <td>{index + 1}</td>
-                    <td>{nhanVien.maSV}</td>
-                    <td>{nhanVien.hoTen}</td>
-                    <td>{nhanVien.email}</td>
-                    <td>{nhanVien.soDienThoai}</td>
+                    <td>{sinhVien.maSV}</td>
+                    <td>{sinhVien.hoTen}</td>
+                    <td>{sinhVien.email}</td>
+                    <td>{sinhVien.soDienThoai}</td>
                     <td className='text-right'>
-                        <button className='btn btn-warning mx-2'>Sửa</button>
+                        <button className='btn btn-warning mx-2'
+                            onClick={() => this.props.dispatch({
+                                type: "LAY_SINH_VIEN",
+                                payload: sinhVien.maSV
+                            })}
+                        >Sửa</button>
                         <button className='btn btn-danger' onClick={
                             () => this.props.dispatch(
                                 {
-                                    type: "XOA_NHAN_VIEN",
-                                    payload: nhanVien.maSV
+                                    type: "XOA_SINH_VIEN",
+                                    payload: sinhVien.maSV
                                 }
                             )
                         }>Xóa</button>

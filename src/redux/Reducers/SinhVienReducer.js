@@ -1,5 +1,7 @@
 const stateDefault = {
-    dsSinhVien: []
+    isSignUp: true,
+    dsSinhVien: [],
+    sinhVienUpdate: "",
 }
 
 export const SinhVienReducer = (state = stateDefault, action) => {
@@ -20,12 +22,26 @@ export const SinhVienReducer = (state = stateDefault, action) => {
             }
             return { ...state, dsSinhVien };
         }
-        case "XOA_NHAN_VIEN": {
+        case "XOA_SINH_VIEN": {
             let dsSinhVien = [...state.dsSinhVien];
 
             let dsSinhVienNew = dsSinhVien.filter(sinhVien => sinhVien.maSV !== payload)
 
             return { ...state, dsSinhVien: dsSinhVienNew };
+        }
+
+        case "LAY_SINH_VIEN": {
+            let dsSinhVien = [...state.dsSinhVien];
+
+            let sinhVienTam = dsSinhVien.find(sinhVien => sinhVien.maSV === payload);
+
+            return { ...state, sinhVienUpdate: sinhVienTam, isSignUp: false };
+        }
+        case "CAP_NHAT_SINH_VIEN": {
+            let dsSinhVien = [...state.dsSinhVien];
+            let sinhVienTam = dsSinhVien.find(sinhVien => sinhVien === payload);
+            return { ...state, sinhVienUpdate: sinhVienTam, isSignUp: false };
+
         }
         default:
             return { ...state };

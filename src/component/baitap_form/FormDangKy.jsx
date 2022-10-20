@@ -6,152 +6,181 @@ class FormDangKy extends Component {
         sinhVien: {
             maSV: "",
             hoTen: "",
+            matKhau: "",
             soDienThoai: "",
-            email: ""
+            email: "",
+            loaiNguoiDung: "0"
         },
         error: {
-            maSV: '',
-            hoTen: '',
-            email: '',
-            soDienThoai: ''
-        },
-        valid: false
+            maSV: "",
+            hoTen: "",
+            matKhau: "",
+            soDienThoai: "",
+            email: "",
+        }
+    }
+
+    static getDerivedStateFromProps(newProps, currentState) {
+        if (newProps.sinhVienUpdate !== "" && newProps.sinhVienUpdate.maSV !== currentState.sinhVien.maSV)
+            return { ...currentState, sinhVien: newProps.sinhVienUpdate }//this.setState({})
     }
 
     changeValue = (event) => {
         const { sinhVien, error } = this.state;
-        const { value, name, title, type } = event.target;
+        const { value, name, title } = event.target;
 
-        /**
-         * Kiểm tra Validate
-         */
+        // cách 1: 
+        // nhanVien.taiKhoan = value;
+        // cách 2: 
+        // nhanVien["taiKhoan"] = value;
 
-        //Kiểm tra rỗng
-        if (value === '') {
-            error[name] = `${title} không được bỏ trống!`;
+        //kiểm tra validation
+        // kiểm tra rỗng
+        if (value === "") {
+            error[name] = `${title} không được rỗng !`;
         } else {
             error[name] = "";
         }
 
-        //Kiểm tra Email
-        if (type === "email" || type === 'number') {
-            let regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-            if (!regexEmail.test(value)) {
-                error[name] = `Email không đúng định dạng!`;
+        const dataType = event.target.getAttribute("data-type");
+        // xử lý validation theo trường hợp đặc biệt
+        if (dataType === "email") {
+            let regexEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+            if (regexEmail.test(value) == false) {
+                error[name] = `${title} không đúng định dạng !`;
             } else {
                 error[name] = "";
             }
         }
-        //Kiểm tra Email
-        if (name === 'soDienThoai') {
-            let regexNumber = /^[0-9]+$/;
-            if (!regexNumber.test(value)) {
-                error[name] = `Số điện thoại không đúng định dạng!`;
-            } else {
-                error[name] = "";
-            }
-        }
+        // if (dataType == "number") {
+        // }
 
-
-
-        //lấy dữ liệu từ input thông qua thuộc tính name
         sinhVien[name] = value;
-        this.setState({ sinhVien }, () => { this.renderButton() })
+
+        this.setState({
+            sinhVien,
+            error
+        })
     }
 
     onSubmit = (event) => {
         event.preventDefault();
+        let { maSV, hoTen, email, soDienThoai } = this.state.sinhVien;
 
-        let { maSV, hoTen, soDienThoai, email } = this.state.sinhVien;
-        let { maSVErr, hoTenErr, soDienThoaiErr, emailErr } = this.state.error;
-        if (maSV !== "" && hoTen !== "" && soDienThoai !== "" && email !== ""
-            // && maSVErr !== "" && hoTenErr !== "" && soDienThoaiErr !== "" && emailErr !== ""
-        ) {
-            //Thêm dữ liệu Sinh Viên
-            this.props.dispatch({
-                type: "THEM_SINH_VIEN",
-                payload: {
-                    sinhVien: this.state.sinhVien
+        let maSVErr = this.state.error.maSV;
+        let hoTenErr = this.state.error.maSV;
+        let emailErr = this.state.error.maSV;
+        let soDienThoaiErr = this.state.error.maSV;
+        if (maSV !== ""
+            && hoTen !== ""
+            && email !== ""
+            && soDienThoai !== ""
+            && maSVErr === ""
+            && hoTenErr === ""
+            && emailErr === ""
+            && soDienThoaiErr === "") {
+
+            if (this.props.isSignUp) {
+                this.props.dispatch({
+                    type: "THEM_SINH_VIEN",
+                    payload: {
+                        sinhVien: this.state.sinhVien,
+                    }
+                })
+            } else {
+            }
+
+            this.setState({
+                sinhVien: {
+                    maSV: "",
+                    hoTen: "",
+                    soDienThoai: "",
+                    email: ""
                 }
             })
-
-            //reset lại form
-            // this.renderButton();
-            event.target.reset();
-        }
-    }
-
-    renderButton = () => {
-        let valid = true;
-        for (let key in this.state.errors) {
-            if (this.state.errors[key] !== '' || this.state.values[key] === '') {
-                valid = false;
-            }
         }
 
-        this.setState({
-            ...this.state,
-            valid: valid
-        })
     }
 
     render() {
-        // console.log(this.props.dsSinhVien);
-        const { maSV, hoTen, soDienThoai, email } = this.state.error;
+        const { sinhVien } = this.state;
+        // this.setState({
+        //     sinhVien: this.props.sinhVienUpdate
+        // })
+        const { maSV, hoTen, email, soDienThoai } = this.state.error;
         return (
-            <div className='row ' >
+            <div className='row '>
                 <div className='col-12 p-2 bg-dark'>
-                    <span className='text-white font-bold'>Thông Tin Sinh Viên</span>
+                    <span className='text-white font-bold'>Thông tin Sinh viên</span>
                 </div>
 
-                <form className='col-12 ' onSubmit={this.onSubmit}>
-                    <div className="row">
-                        <div className="col-6 mt-2 form-group">
-                            <span >Mã SV</span>
-                            <input name='maSV' className="form-control" title='Mã SV' value={this.state.sinhVien.maSV} onChange={this.changeValue} />
-                            <span className="text-danger">{maSV}</span>
-                        </div>
-
-                        <div className="col-6 mt-2 form-group">
-                            <span >Họ tên</span>
-                            <input name='hoTen' className="form-control" title='Họ Tên' value={this.state.sinhVien.hoTen} onChange={this.changeValue} />
-                            <span className="text-danger">{hoTen}</span>
-                        </div>
-
-                        <div className="col-6 mt-2 form-group">
-                            <span >Email</span>
-                            <input type="email" name='email' className="form-control" title='Email' value={this.state.sinhVien.email} onChange={this.changeValue} />
-                            <span className="text-danger">{email}</span>
-                        </div>
-
-                        <div className="col-6 mt-2 form-group">
-                            <span >Số điện thoại</span>
-                            <input name='soDienThoai' className="form-control" title='Số Điện Thoại' value={this.state.sinhVien.soDienThoai} onChange={this.changeValue} />
-                            <span className="text-danger">{soDienThoai}</span>
-                        </div>
-
+                <form className='col-12 row' onSubmit={this.onSubmit}>
+                    <div className="col-6">
+                        <label >Mã Sinh Viên</label>
+                        <input title="Tài khoản"
+                            value={this.state.sinhVien.maSV}
+                            name="maSV" className="form-control" onChange={this.changeValue} />
+                        <small className="text-danger">
+                            {maSV}
+                        </small>
                     </div>
-                    <div className="row mb-3">
-                        <div className="col-md-12 text-right">
-                            {this.state.valid
-                                ?
-                                <button className="btn btn-success">Thêm sinh viên</button>
-                                :
-                                <button className="btn btn-primary ml-3" disabled>Thêm sinh viên</button>
-                            }
-                            {/* {this.renderButton()} */}
-                        </div>
+
+                    <div className="col-6">
+                        <label >Họ tên</label>
+                        <input title="Họ tên"
+                            value={this.state.sinhVien.hoTen}
+                            name="hoTen" className="form-control" onChange={this.changeValue} />
+                        <small className="text-danger">
+                            {hoTen}
+                        </small>
                     </div>
+
+                    <div className="col-6">
+                        <label >Số điện thoại</label>
+                        <input data-type="number"
+                            title="Số điện thoại"
+                            value={this.state.sinhVien.soDienThoai}
+                            name="soDienThoai"
+                            className="form-control" onChange={this.changeValue} />
+                        <small className="text-danger">
+                            {soDienThoai}
+                        </small>
+                    </div>
+                    <div className="col-6">
+                        <label >Email</label>
+                        <input
+                            title="Email"
+                            value={this.state.sinhVien.email}
+                            data-type="email" name="email" className="form-control" onChange={this.changeValue} />
+                        <small className="text-danger">
+                            {email}
+                        </small>
+                    </div>
+                    <div className="col-6">
+                        <button className="btn btn-success m-2">Thêm sinh viên</button>
+
+                        <button className="btn btn-primary m-2"
+                            onClick={
+                                () => this.props.dispatch({
+                                    type: "CAP_NHAT_SINH_VIEN",
+                                    payload: sinhVien.maSV
+                                })}
+                        >Cập nhật</button>
+                    </div>
+
+
                 </form>
 
-            </div >
+            </div>
         )
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        dsSinhVien: state.SinhVienReducer.dsSinhVien
+        dsSinhVien: state.SinhVienReducer.dsSinhVien,
+        sinhVienUpdate: state.SinhVienReducer.sinhVienUpdate,
+        isSignUp: state.SinhVienReducer.isSignUp
     }
 }
 
